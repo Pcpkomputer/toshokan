@@ -51,18 +51,14 @@ $tanggal=date('d/m/Y');
     <div class="content__main">
 
          <div id="panelkelolabukumode2" class="content__main-page" style="display: none">
-        <hr id="kududihiddenmode2">
-        <h1 id="kududihiddenmode2">Kelola Buku - Simplified</h1>
-        <hr>
-        <select id="kududihiddenmode2" class="form-control modekelolabukumode2" style="width: 100px;float: right;margin-top:-67px;">
-  <option>Mode 1</option>
-  <option>Mode 2</option>
-</select>
+      
 
       </div>
 
        <div id="panelkelolapinjaman" class="content__main-page" style="display: none">
-        <h1>NGENTOOODD</h1>
+        <hr>
+        <h1>Kelola Pinjaman</h1>
+        <hr>
       </div>
 
       <div id="panelkelolabuku" class="content__main-page">
@@ -167,6 +163,7 @@ $tanggal=date('d/m/Y');
 		document.querySelector('#panelkelolaanggota').style.display='none';
     document.querySelector('#panelkelolapinjaman').style.display='none';
     document.querySelector('#panelkelolabukumode2').style.display='none';
+    sembunyi(document.querySelectorAll('#pencarianmodesimplified')[0]);
 	}
 
   var modekelolabukurefresh=function(){
@@ -184,8 +181,81 @@ $tanggal=date('d/m/Y');
 
 	var awal=parseInt(document.querySelectorAll('#indexpagination')[0].innerText);
 
+  $(document).on('input', '#guambar', (e)=>{
+    e.preventDefault();
+    var formData= new FormData($('#formgambar')[0]);
+    let kodetogel=/kodetogel=\"(\d+)\"/.exec(document.getElementById('kontenkelolabuku').innerHTML)[1];
+    $.ajax({
+      url: 'imagehandler.php',
+      type: 'POST',
+      data: formData,
+      async: false,
+      cache: false,
+      contentType: false,
+      enctype: 'multipart/form-data',
+      processData: false,
+      success: function(response){
+        $.ajax({
+          url:'imagehandler.php',
+          type:'POST',
+          data:'updatestringgambar=true&kodetogel='+kodetogel,
+          success: function(response){
+            console.log(response);
+          },
+          error: function(err){
+            console.log(err);
+          }
+        })
+      },
+      error: function(err){
+        console.log(err);
+      }
+    })
+  })
+
+  $(document).on('click', '#guambarcuk', function(e){
+    document.getElementById('guambar').click();
+  })
+
+  $(document).on('click', '#panelselengkapnyamodesimplified', (e)=>{
+    let kodetogel=/kodetogel=\"(\d+)\"/.exec(e.currentTarget.outerHTML)[1];
+     $.ajax({
+      type:'POST',
+      url:'api.php',
+      data:'selengkapnya_1=true&jurukunci='+kodetogel,
+      success:function(res){
+        document.getElementById('pencarian').style.display='';
+        document.getElementById('kontenkelolabuku').innerHTML=res;
+        document.querySelectorAll('#kududihidden')[0].style.display='none';
+        document.querySelectorAll('#kududihidden')[1].style.display='none';
+        document.querySelectorAll('#kududihidden')[2].style.display='none';
+        document.getElementById('panelkelolabukumode2').style.display='none';
+        sembunyi(document.getElementById('pencarianmodesimplified'));
+        tidaksembunyi(document.getElementById('panelkelolabuku'));
+        tidaksembunyi(document.getElementById('kontenkelolabuku'));
+        document.getElementById('paginasi').innerHTML='';
+        awal=1;
+      },
+      error:function(err){
+        console.log(err);
+      }
+    })
+    
+  })
+
   $(document).on('input', '#pencarianmodesimplified', (e)=>{
-    console.log(e.currentTarget.value);
+    $.ajax({
+      type:'POST',
+      url:'api.php',
+      data:'querymodesimplified=true&query='+e.currentTarget.value,
+      success:function(res){
+        document.getElementById('panelkelolabukumode2').innerHTML=res;
+        document.querySelectorAll('.modekelolabukumode2')[0].value='Mode 2';
+      },
+      error:function(err){
+        console.log(err);
+      }
+    })
   })
 
   $(document).on('input', '.modekelolabukumode2', function(e){
@@ -222,9 +292,20 @@ $tanggal=date('d/m/Y');
     //console.log(e.currentTarget.value);
     if(e.currentTarget.value=="Mode 2"){
       cilukba();
-      document.getElementById('panelkelolabukumode2').style.display='';
-      document.querySelectorAll('.modekelolabukumode2')[0].value='Mode 2';
-      tidaksembunyi(document.querySelectorAll('#pencarianmodesimplified')[0]);
+      $.ajax({
+        type:'POST',
+        url:'api.php',
+        data:'loadmodekelolabuku2=true',
+        success: function(res){
+          document.getElementById('panelkelolabukumode2').innerHTML=res;
+          document.getElementById('panelkelolabukumode2').style.display='';
+         document.querySelectorAll('.modekelolabukumode2')[0].value='Mode 2';
+         tidaksembunyi(document.querySelectorAll('#pencarianmodesimplified')[0]);
+        },
+        error: function(err){
+          console.log(err);
+        }
+      })
     }
     if(e.currentTarget.value=="Mode 1"){
          $.ajax({
@@ -249,6 +330,7 @@ $tanggal=date('d/m/Y');
 
   $(document).on('click', '#kelolapinjaman', (e)=>{
     cilukba();
+     sembunyi(document.querySelectorAll('#pencarianmodesimplified')[0]);
     document.querySelectorAll('#panelkelolapinjaman')[0].style.display='';
   })
 
@@ -260,7 +342,25 @@ $tanggal=date('d/m/Y');
       url:'api.php',
       data:'deleteketeranganbuku=true&kodetogel='+kodetogel,
       success: function(res){
-        console.log(res);
+         $.ajax({
+                type:'POST',
+                data:'ifetch=1',
+                url:'api.php',
+                success: function(response){
+                   document.querySelectorAll('#kududihidden')[0].style.display='';
+                  document.querySelectorAll('#kududihidden')[1].style.display='';
+                  document.querySelectorAll('#kududihidden')[2].style.display='';
+                  document.querySelector('.modekelolabuku').value='Mode 1';
+                  document.querySelectorAll('#pencarian')[0].style.display='';
+                  awal=1;
+                  document.querySelector('#paginasi').innerHTML='<nav aria-label="Page navigation example"><ul class="pagination justify-content-center"><li id="sebelum" class="page-item disabled"><a class="page-link" href="#" tabindex="-1">Previous</a></li><li id="indexpagination" class="page-item disabled"><a class="page-link" href="#">1</a></li><li  id="sesudah" class="page-item "><a class="page-link" href="#">Next</a></li></ul></nav>'
+                  document.getElementById('kontenkelolabuku').innerHTML=response;
+                },
+                error: function(error){
+                  console.log(error);
+                }
+
+              })
       },
       error: function(err){
         console.log(err);
@@ -277,6 +377,8 @@ $tanggal=date('d/m/Y');
                    document.querySelectorAll('#kududihidden')[0].style.display='';
                   document.querySelectorAll('#kududihidden')[1].style.display='';
                   document.querySelectorAll('#kududihidden')[2].style.display='';
+                  document.querySelector('.modekelolabuku').value='Mode 1';
+                  document.querySelectorAll('#pencarian')[0].style.display='';
                   awal=1;
                   document.querySelector('#paginasi').innerHTML='<nav aria-label="Page navigation example"><ul class="pagination justify-content-center"><li id="sebelum" class="page-item disabled"><a class="page-link" href="#" tabindex="-1">Previous</a></li><li id="indexpagination" class="page-item disabled"><a class="page-link" href="#">1</a></li><li  id="sesudah" class="page-item "><a class="page-link" href="#">Next</a></li></ul></nav>'
                   document.getElementById('kontenkelolabuku').innerHTML=response;
@@ -310,6 +412,7 @@ $tanggal=date('d/m/Y');
                 data:'ifetch=1',
                 url:'api.php',
                 success: function(response){
+                  document.querySelectorAll('.modekelolabuku')[0].value='Mode 1';
                    document.querySelectorAll('#kududihidden')[0].style.display='';
                   document.querySelectorAll('#kududihidden')[1].style.display='';
                   document.querySelectorAll('#kududihidden')[2].style.display='';
@@ -692,6 +795,7 @@ $tanggal=date('d/m/Y');
 	$(document).on('click','#kelolaanggota', function(e){
 		e.preventDefault();
 		cilukba();
+    sembunyi(document.querySelectorAll('#pencarianmodesimplified')[0]);
 		document.querySelector('#panelkelolaanggota').style.display='';
 		$.ajax({
 			type:'POST',

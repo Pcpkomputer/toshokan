@@ -305,9 +305,9 @@ if(isset($_POST['selengkapnya_1'])){
 	if($conn->query($sql)==True){
 		$a=$conn->query($sql);
 		while($hasil=$a->fetch_assoc()){
-			echo '<kodetogel kodetogel="'.$hasil['id'].'" style="hidden"><img src="'.$hasil['gambar'].'" class="rounded float-left" alt="..." style="margin-top: 5px;height: 480px; width: 350px;">
+			echo '<kodetogel kodetogel="'.$hasil['id'].'" style="hidden"><img id="guambarcuk" src="'.$hasil['gambar'].'" class="rounded float-left" alt="..." style="margin-top: 5px;height: 480px; width: 350px;">
         <div id="keteranganbuku">
-        <form id="formketeranganbuku" style="width: 700px;float: right;max-height: 500px; overflow-y: scroll;">
+        <form id="formketeranganbuku" style="width: 700px;float: right;max-height: 500px; overflow-y: scroll;" enctype="multipart/form-data">
   <div class="form-group">
     <label for="exampleFormControlInput1">Judul Buku</label>
     <input name="judul" value="'.$hasil['judul'].'" id="inputketeranganbuku" type="text" class="form-control" id="exampleFormControlInput1" disabled>
@@ -339,7 +339,11 @@ if(isset($_POST['selengkapnya_1'])){
   <button id="hapusketeranganbuku" type="button" class="btn btn-danger">Hapus</button>
 <button id="kembaliketeranganbuku" type="button" class="btn btn-primary">Kembali</button>
 
-</form>';
+</form>
+<form id="formgambar" enctype="multipart/form-data" style="display:none;">
+<input name="guambar" id="guambar" type="file" style="display:none;"></input>
+</form>
+';
 
 		}
 	}
@@ -368,6 +372,102 @@ if(isset($_POST['deleteketeranganbuku'])){
 	else{
 		print_r('error');
 	} 
+}
+
+if(isset($_POST['loadmodekelolabuku2'])){
+	include 'db.php';
+	$query='SELECT * FROM daftar_buku;';
+	$koneksi=$conn->query($query);
+	echo ' <hr id="kududihiddenmode2">
+        <h1 id="kududihiddenmode2">Kelola Buku - Simplified</h1>
+        <hr>
+        <select id="kududihiddenmode2" class="form-control modekelolabukumode2" style="width: 100px;float: right;margin-top:-67px;">
+  <option>Mode 1</option>
+  <option>Mode 2</option>
+</select>
+
+<table class="table table-sm">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Judul</th>
+      <th scope="col">Penjelasan</th>
+      <th scope="col">Gambar</th>
+      <th scope="col">Lokasi</th>
+      <th scope="col">Penulis</th>
+      <th scope="col">Penerbit</th>
+      <th scope="col">Tahun Terbit</th>
+       <th scope="col">@Panel</th>
+    </tr>
+  </thead>
+  <tbody>';
+	while($hasil=$koneksi->fetch_assoc()){
+	echo '  <tr>
+      <th scope="row">'.$hasil['id'].'</th>
+      <td>'.$hasil['judul'].'</td>
+      <td>'.substr($hasil['penjelasan'],0,200).'</td>
+      <td>'.$hasil['gambar'].'</td>
+      <td>'.$hasil['lokasi'].'</td>
+      <td>'.$hasil['penulis'].'</td>
+      <td>'.$hasil['penerbit'].'</td>
+      <td>'.$hasil['tahunterbit'].'</td>
+      <td><a id="panelselengkapnyamodesimplified" href="#" class="btn btn-dark" kodetogel="'.$hasil['id'].'">Panel</a></td>
+      </tr>';
+	}
+	echo '</tbody></table>';
+
+}
+
+if(isset($_POST['querymodesimplified'])){
+	include 'db.php';
+	$query='SELECT * FROM daftar_buku WHERE judul LIKE "%'.$_POST['query'].'%";';
+	$koneksi=$conn->query($query);
+	if(mysqli_num_rows($koneksi)>0){
+	echo ' <hr id="kududihiddenmode2">
+        <h1 id="kududihiddenmode2">Kelola Buku - Simplified</h1>
+        <hr>
+        <select id="kududihiddenmode2" class="form-control modekelolabukumode2" style="width: 100px;float: right;margin-top:-67px;">
+  <option>Mode 1</option>
+  <option>Mode 2</option>
+</select>
+
+<table class="table table-sm">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Judul</th>
+      <th scope="col">Penjelasan</th>
+      <th scope="col">Gambar</th>
+      <th scope="col">Lokasi</th>
+      <th scope="col">Penulis</th>
+      <th scope="col">Penerbit</th>
+      <th scope="col">Tahun Terbit</th>
+       <th scope="col">@Panel</th>
+    </tr>
+  </thead>
+  <tbody>';
+	while($hasil=$koneksi->fetch_assoc()){
+	echo '  <tr>
+      <th scope="row">'.$hasil['id'].'</th>
+      <td>'.$hasil['judul'].'</td>
+      <td>'.substr($hasil['penjelasan'],0,200).'</td>
+      <td>'.$hasil['gambar'].'</td>
+      <td>'.$hasil['lokasi'].'</td>
+      <td>'.$hasil['penulis'].'</td>
+      <td>'.$hasil['penerbit'].'</td>
+      <td>'.$hasil['tahunterbit'].'</td>
+      <td><a id="panelselengkapnyamodesimplified" href="#" class="btn btn-dark" kodetogel="'.$hasil['id'].'">Panel</a></td>
+      </tr>';
+	}
+	echo '</tbody></table>';
+}
+
+	else{
+		echo '<h1>Tidak ditemukan hasil</h1>';
+	}
+
+
+
 }
 
 ?>
