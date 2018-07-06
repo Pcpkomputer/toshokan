@@ -59,6 +59,50 @@ $tanggal=date('d/m/Y');
         <hr>
         <h1>Kelola Pinjaman</h1>
         <hr>
+        <button type="button" class="btn btn-success">Tambah Pinjaman</button>
+
+
+
+          <form action="/action_page.php" method="get">
+        <input class="form-control form-control-sm" list="browsers" name="browser" placeholder="Judul Buku">
+        <datalist id="browsers">
+          <option value="Internet Explorer">
+          <option value="Firefox">
+          <option value="Chrome">
+          <option value="Opera">
+          <option value="Safari">
+        </datalist>
+
+        <input class="form-control form-control-sm" list="browsers" name="browser" placeholder="Peminjam">
+        <datalist id="browsers">
+          <option value="Internet Explorer">
+          <option value="Firefox">
+          <option value="Chrome">
+          <option value="Opera">
+          <option value="Safari">
+        </datalist>
+      </form>
+
+
+
+        <table class="table table-sm table-light table-hover" style="margin-top:15px;">
+  <thead>
+    <tr>
+      <th scope="col">Judul Buku</th>
+      <th scope="col">Peminjam</th>
+      <th scope="col">Waktu Pinjam</th>
+      <th scope="col">Batas Pengembalian</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="table-success">
+      <td>Mark</td>
+      <td>Otto</td>
+      <td>@mdo</td>
+      <td>@mdo</td>
+    </tr>
+  </tbody>
+</table>
       </div>
 
       <div id="panelkelolabuku" class="content__main-page">
@@ -198,9 +242,27 @@ $tanggal=date('d/m/Y');
         $.ajax({
           url:'imagehandler.php',
           type:'POST',
-          data:'updatestringgambar=true&kodetogel='+kodetogel,
+          data:'updatestringgambar=true&kodetogel='+kodetogel+'&namafile='+response,
           success: function(response){
-            console.log(response);
+            $.ajax({
+                type:'POST',
+                data:'ifetch=1',
+                url:'api.php',
+                success: function(response){
+                   document.querySelectorAll('#kududihidden')[0].style.display='';
+                  document.querySelectorAll('#kududihidden')[1].style.display='';
+                  document.querySelectorAll('#kududihidden')[2].style.display='';
+                  document.querySelector('.modekelolabuku').value='Mode 1';
+                  document.querySelectorAll('#pencarian')[0].style.display='';
+                  awal=1;
+                  document.querySelector('#paginasi').innerHTML='<nav aria-label="Page navigation example"><ul class="pagination justify-content-center"><li id="sebelum" class="page-item disabled"><a class="page-link" href="#" tabindex="-1">Previous</a></li><li id="indexpagination" class="page-item disabled"><a class="page-link" href="#">1</a></li><li  id="sesudah" class="page-item "><a class="page-link" href="#">Next</a></li></ul></nav>'
+                  document.getElementById('kontenkelolabuku').innerHTML=response;
+                },
+                error: function(error){
+                  console.log(error);
+                }
+
+              })
           },
           error: function(err){
             console.log(err);

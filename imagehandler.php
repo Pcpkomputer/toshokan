@@ -3,10 +3,17 @@ if(isset($_FILES['guambar'])){
 	$file=$_FILES['guambar']['tmp_name'];
 	$destinasi='assets/image/'.$_FILES['guambar']['name'];
 	move_uploaded_file($file, $destinasi);
-	var_dump($_FILES['guambar']);
+	echo $_FILES['guambar']['name'];
 }
 
 if(isset($_POST['updatestringgambar'])){
-	print_r('sukses bosq');
+	include 'db.php';
+	$q='UPDATE daftar_buku SET gambar="'.$_POST['namafile'].'" WHERE id="'.$_POST['kodetogel'].'";';
+	if($conn->query($q)==True){
+		print_r('sukses');
+	}
+	else{
+		print_r('gagal');
+	}
 }
 ?>

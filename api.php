@@ -305,9 +305,9 @@ if(isset($_POST['selengkapnya_1'])){
 	if($conn->query($sql)==True){
 		$a=$conn->query($sql);
 		while($hasil=$a->fetch_assoc()){
-			echo '<kodetogel kodetogel="'.$hasil['id'].'" style="hidden"><img id="guambarcuk" src="'.$hasil['gambar'].'" class="rounded float-left" alt="..." style="margin-top: 5px;height: 480px; width: 350px;">
+			echo '<kodetogel kodetogel="'.$hasil['id'].'" style=""><img id="guambarcuk" src="assets/image/'.$hasil['gambar'].'" class="rounded float-left" alt="..." style="margin-top: 5px;height: 496px; width: 367px;margin-left:-10px;">
         <div id="keteranganbuku">
-        <form id="formketeranganbuku" style="width: 700px;float: right;max-height: 500px; overflow-y: scroll;" enctype="multipart/form-data">
+        <form id="formketeranganbuku" style="margin-right:-20px;width: 700px;float: right;max-height: 500px; overflow-y: scroll;" enctype="multipart/form-data">
   <div class="form-group">
     <label for="exampleFormControlInput1">Judul Buku</label>
     <input name="judul" value="'.$hasil['judul'].'" id="inputketeranganbuku" type="text" class="form-control" id="exampleFormControlInput1" disabled>
@@ -335,6 +335,14 @@ if(isset($_POST['selengkapnya_1'])){
     <label for="exampleFormControlInput1">Tahun Terbit</label>
     <input name="tahunterbit" value="'.$hasil['tahunterbit'].'" id="inputketeranganbuku" type="text" class="form-control" id="exampleFormControlInput1" disabled>
   </div>
+  <div class="form-group">
+    <label for="exampleFormControlInput1">Stok</label>
+    <input name="stok" value="'.$hasil['stok'].'" id="inputketeranganbuku" type="text" class="form-control" id="exampleFormControlInput1" disabled>
+  </div>
+  <div class="form-group">
+    <label for="exampleFormControlInput1">Kategori</label>
+    <input name="kategori" value="'.$hasil['kategori'].'" id="inputketeranganbuku" type="text" class="form-control" id="exampleFormControlInput1" disabled>
+  </div>
   <button id="ubahketeranganbuku" type="button" class="btn btn-success">Ubah</button>
   <button id="hapusketeranganbuku" type="button" class="btn btn-danger">Hapus</button>
 <button id="kembaliketeranganbuku" type="button" class="btn btn-primary">Kembali</button>
@@ -354,7 +362,7 @@ if(isset($_POST['selengkapnya_1'])){
 
 if(isset($_POST['updateketeranganbuku'])){
 	include 'db.php';
-	$koneksi='UPDATE daftar_buku SET judul="'.$_POST['judul'].'",penjelasan="'.$_POST['keterangan'].'",lokasi="'.$_POST['lokasi'].'",penulis="'.$_POST['penulis'].'",penerbit="'.$_POST['penerbit'].'",tahunterbit="'.$_POST['tahunterbit'].'" WHERE id="'.$_POST['nomortogel'].'";';
+	$koneksi='UPDATE daftar_buku SET judul="'.$_POST['judul'].'",penjelasan="'.$_POST['keterangan'].'",lokasi="'.$_POST['lokasi'].'",penulis="'.$_POST['penulis'].'",penerbit="'.$_POST['penerbit'].'",tahunterbit="'.$_POST['tahunterbit'].'",stok="'.$_POST['stok'].'",kategori="'.$_POST['kategori'].'" WHERE id="'.$_POST['nomortogel'].'";';
 	if($conn->query($koneksi)==True){
 		print_r('sukses');
 	}
