@@ -478,4 +478,74 @@ if(isset($_POST['querymodesimplified'])){
 
 }
 
+if(isset($_POST['tambahpinjamanbuku'])){
+	include 'db.php';
+	$proses=false;
+	//echo strlen($_POST['judulbuku']);
+	$auth='SELECT * FROM daftar_buku WHERE judul="'.$_POST['judulbuku'].'";';
+	$auth1='SELECT * FROM anggota_toshokan WHERE nama="'.$_POST['peminjam'].'";';
+	$koneksi1=$conn->query($auth);
+	$hasilkoneksi1=$koneksi1->fetch_assoc();
+	$koneksi2=$conn->query($auth1);
+
+	if(isset($hasilkoneksi1['stok'])) {
+		if($hasilkoneksi1['stok']==0){
+			print_r('#[stokbukuhabis]');
+			$proses=false;
+		}
+		else{
+			if(mysqli_num_rows($koneksi1)>0){
+				$proses=true;
+			}
+			else{
+				$proses=false;
+			}
+			if(mysqli_num_rows($koneksi2)>0){
+				$proses=true;
+			}
+			else{
+				$proses=false;
+			}
+			if($_POST['batastanggal']==''){
+				$proses=false;
+			}
+
+		}
+		
+	}
+	else{
+		$proses=false;
+	}
+
+	if($proses==true){
+		$jml=$hasilkoneksi1['stok']-1;
+		$quer='UPDATE daftar_buku SET stok="'.$jml.'" WHERE judul="'.$_POST['judulbuku'].'";';
+		$query='INSERT INTO pinjaman_buku (id,judul,peminjam,waktupinjam,bataspengembalian) VALUES (NULL,"'.$_POST['judulbuku'].'","'.$_POST['peminjam'].'","'.$_POST['tanggalkirim'].'","'.$_POST['batastanggal'].'");';
+		$a=$conn->query($quer);
+		if($conn->query($query)==True){
+			print_r('sukses');
+		}
+	}
+	else if($proses==false){
+		print_r('#[gagal]');
+	}
+}
+
+if(isset($_POST['loadkelolapinjaman'])){
+	include 'db.php';
+	$query='SELECT * FROM pinjaman_buku ORDER BY id DESC;';
+	$konek=$conn->query($query);
+	while($hasil=$konek->fetch_assoc()){
+		echo ' <tr id="rowpinjaman">
+      <td>'.$hasil['judul'].'</td>
+      <td>'.$hasil['peminjam'].'</td>
+      <td>'.$hasil['waktupinjam'].'</td>
+      <td>'.$hasil['bataspengembalian'].'</td>
+      <td><button class="btn btn-success">Dikembalikan</button><button class="btn btn-danger">Hapus</button></td>
+    </tr>
+    ';
+	}
+
+}
+
 ?>

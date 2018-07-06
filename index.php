@@ -59,28 +59,38 @@ $tanggal=date('d/m/Y');
         <hr>
         <h1>Kelola Pinjaman</h1>
         <hr>
-        <button type="button" class="btn btn-success">Tambah Pinjaman</button>
+        <button id="btntambahpinjaman" type="button" class="btn btn-success" style="margin-bottom: 10px;">Tambah Pinjaman</button>
 
 
+          <form id="formkelolapinjaman" name="formkelolapinjaman" style="display: none;">
+        <input style="margin-bottom: 4px;" class="form-control" list="judulbuku" name="judulbuku" placeholder="Judul Buku">
+        <?php
+        include 'db.php';
+        $q='SELECT * FROM daftar_buku;';
+        $koneksi=$conn->query($q);
+        echo '<datalist id="judulbuku">';
+        while($hasil=$koneksi->fetch_assoc()){
+          echo '
+          <option value="'.$hasil['judul'].'">';
+        }
+        echo ' </datalist>';
+        ?>
 
-          <form action="/action_page.php" method="get">
-        <input class="form-control form-control-sm" list="browsers" name="browser" placeholder="Judul Buku">
-        <datalist id="browsers">
-          <option value="Internet Explorer">
-          <option value="Firefox">
-          <option value="Chrome">
-          <option value="Opera">
-          <option value="Safari">
-        </datalist>
-
-        <input class="form-control form-control-sm" list="browsers" name="browser" placeholder="Peminjam">
-        <datalist id="browsers">
-          <option value="Internet Explorer">
-          <option value="Firefox">
-          <option value="Chrome">
-          <option value="Opera">
-          <option value="Safari">
-        </datalist>
+        <input class="form-control" list="peminjam" name="peminjam" placeholder="Peminjam">
+        <?php
+        include 'db.php';
+        $q='SELECT * FROM anggota_toshokan;';
+        $koneksi=$conn->query($q);
+        echo '<datalist id="peminjam">';
+        while($hasil=$koneksi->fetch_assoc()){
+          echo '
+          <option value="'.$hasil['nama'].'">';
+        }
+        echo ' </datalist>';
+        ?>
+        <label style="margin-left: 3px;margin-top: 5px;">Batas Pengembalian :</label>
+        <input type="date" style="margin-top: 1px;" class="form-control" name="batastanggal">
+        <button id="tambahpinjamanbuku" class="btn btn-success" style="width: 1080px; margin-top: 10px;">Tambah</button>
       </form>
 
 
@@ -92,15 +102,11 @@ $tanggal=date('d/m/Y');
       <th scope="col">Peminjam</th>
       <th scope="col">Waktu Pinjam</th>
       <th scope="col">Batas Pengembalian</th>
+      <th scope="col">@Panel</th>
     </tr>
   </thead>
-  <tbody>
-    <tr class="table-success">
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-      <td>@mdo</td>
-    </tr>
+  <tbody id="isibodypinjaman">
+
   </tbody>
 </table>
       </div>
@@ -224,6 +230,98 @@ $tanggal=date('d/m/Y');
   }
 
 	var awal=parseInt(document.querySelectorAll('#indexpagination')[0].innerText);
+
+  $(document).on('click', '#kelolapinjaman', function(e){
+    e.preventDefault();
+    $.ajax({
+      type:'POST',
+      data:'loadkelolapinjaman=true',
+      url:'api.php',
+      success: function(res){
+        document.getElementById('isibodypinjaman').innerHTML=res;
+
+        var rowpinjaman=document.querySelectorAll('#rowpinjaman');
+        var tglsekarang=document.getElementById('date').innerHTML;
+        var x=/(\d+)\/(\d+)\/(\d+)/.exec(tglsekarang);
+        var t=parseInt(x[3])*360;
+        var b=parseInt(x[2])*30;  
+        var h=parseInt(x[1]);
+        var date=t+b+h;
+
+        rowpinjaman.forEach((a,b)=>{
+        var hasil=/<td>\d+-\d+-\d+<\/td>\s+<td>(\d+-\d+-\d+)<\/td>/.exec(a.innerHTML)[1];
+        var a=/(\d+)-(\d+)-(\d+)/.exec(hasil);
+        var tahun=parseInt(a[1])*360;
+        var bulan=parseInt(a[2])*30;
+        var hari=parseInt(a[3]);
+        var dd=tahun+bulan+hari;
+        var hash=date-dd;
+        console.log(hash);
+
+         if(hash>0){
+        document.querySelectorAll('#rowpinjaman')[b].classList.add('table-danger');
+        }
+
+        else if(hash<0){
+        document.querySelectorAll('#rowpinjaman')[b].classList.add('table-success');
+      
+        }
+
+        else if(hash=0){
+        document.querySelectorAll('#rowpinjaman')[b].classList.add('table-warning');
+        }
+  
+      
+        })
+
+
+      },
+      error: function(err){
+        console.log(err);
+      }
+    })
+  })
+
+  $(document).on('click', '#tambahpinjamanbuku', function(e){
+    e.preventDefault();
+    var data=$('#formkelolapinjaman').serialize();
+    var tanggalskr=document.getElementById('date').innerHTML.replace(/\//g,'-');
+    var tanggalskr=/(\d+)-(\d+)-(\d+)/.exec(tanggalskr);
+    var tgl=tanggalskr[3]+'-'+tanggalskr[2]+'-'+tanggalskr[1];
+    var data=data+'&tambahpinjamanbuku=true&tanggalkirim='+tgl;
+    $.ajax({
+      url:'api.php',
+      type:'POST',
+      data:data,
+      success: function(res){
+        if(res.match(/#\[stokbukuhabis]/)){
+          alert('Stok buku habis / Sedang dipinjam');
+        }
+        if(res.match(/#\[gagal]/)){
+          console.log('gagal');
+        }
+        if(res.match('sukses')){
+          console.log(res);
+        }
+      },
+      error: function(err){
+        console.log(err);
+      }
+    })
+  })
+
+  $(document).on('click', '#btntambahpinjaman', (e)=>{
+    if(e.currentTarget.outerHTML.match('Tambah Pinjaman')){
+    document.getElementById('formkelolapinjaman').style.display='';
+    e.currentTarget.outerHTML='<button id="btntambahpinjaman" type="button" class="btn btn-success" style="margin-bottom: 10px;">Tutup</button>';
+    }
+    else if(e.currentTarget.outerHTML.match('Tutup')){
+    document.getElementById('formkelolapinjaman').style.display='none';
+    e.currentTarget.outerHTML='<button id="btntambahpinjaman" type="button" class="btn btn-success" style="margin-bottom: 10px;">Tambah Pinjaman</button>';
+    }
+    
+
+  })
 
   $(document).on('input', '#guambar', (e)=>{
     e.preventDefault();
