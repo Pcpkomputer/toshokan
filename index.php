@@ -5,11 +5,16 @@ $tanggal=date('d/m/Y');
 <html lang="en"><head>
   <meta charset="UTF-8">
   <title>Admin Page Layout</title>
-  <script src="https://cdn.linearicons.com/free/1.0.0/svgembedder.min.js"></script>
-<link href="https://fonts.googleapis.com/css?family=Poppins:400,600" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+  <script src="js/svgembedder.min.js"></script>
+<link href="css/Poppins.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/reset.min.css">
       <link rel="stylesheet" href="css/style.css">
-      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+      <link rel="stylesheet" href="css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+      <style type="text/css">
+      #guambarcuk{
+        cursor: pointer;
+      }
+      </style>
 </head>
 
 <body>
@@ -50,6 +55,21 @@ $tanggal=date('d/m/Y');
     
     <div class="content__main">
 
+    <div id="panelkelolastatistik" class="content__main-page" style="display: none;">
+     <hr>
+        <h1>Kelola Statistik</h1>
+       
+        <hr>
+        <input class="form-control" type="text" name="">
+    </div>
+
+    <div class="content__main-page" id="logkelolabuku" style="display:none;">
+      <hr>
+        <h1>Log Pinjaman</h1>
+      <hr>
+    </div>
+
+
          <div id="panelkelolabukumode2" class="content__main-page" style="display: none">
       
 
@@ -58,9 +78,13 @@ $tanggal=date('d/m/Y');
        <div id="panelkelolapinjaman" class="content__main-page" style="display: none">
         <hr>
         <h1>Kelola Pinjaman</h1>
+        <select class="form-control modekelolapinjaman" style="width: 150px;float: right;margin-top:-45px;">
+       <option>Kelola Pinjaman</option>
+         <option>Log Pinjaman</option>
+        </select>
         <hr>
-        <button id="btntambahpinjaman" type="button" class="btn btn-success" style="margin-bottom: 10px;">Tambah Pinjaman</button>
-
+        <button id="btntambahpinjaman" type="button" class="btn btn-success" style="margin-bottom: 10px;float: left;">Tambah Pinjaman</button>
+        <input id="kueripencarianpinjaman" class="form-control" style="margin-left: 3px;width: 350px;float: left" type="text" name="" placeholder="Kueri Pencarian">
 
           <form id="formkelolapinjaman" name="formkelolapinjaman" style="display: none;">
         <input style="margin-bottom: 4px;" class="form-control" list="judulbuku" name="judulbuku" placeholder="Judul Buku">
@@ -130,7 +154,7 @@ $tanggal=date('d/m/Y');
 		  <h5 class="card-header">'.$konten['judul'].'</h5>
 		  <div class="card-body">
 		    <h5 class="card-title">'.$konten['penulis'].' / '.$konten['penerbit'].' / '.$konten['tahunterbit'].'</h5>
-		    <p class="card-text">'.$konten['penjelasan'].'</p>
+		    <p class="card-text" style="max-height:146;overflow:hidden;">'.$konten['penjelasan'].'</p>
 		    <a href="#" id="selengkapnya_1" jurukunci="'.$konten['id'].'" class="btn btn-dark">Selengkapnya</a>
 		  </div>
 		</div>
@@ -196,8 +220,8 @@ $tanggal=date('d/m/Y');
 </div>
     <script src="js/index.js"></script>
     <script src="jquery.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+	<script src="js/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+	<script src="js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
 	<script type="text/javascript">
     //Padang Perwira Yudha
     //28 Juni 2018
@@ -213,6 +237,8 @@ $tanggal=date('d/m/Y');
 		document.querySelector('#panelkelolaanggota').style.display='none';
     document.querySelector('#panelkelolapinjaman').style.display='none';
     document.querySelector('#panelkelolabukumode2').style.display='none';
+    document.querySelector('#panelkelolastatistik').style.display='none';
+    document.querySelectorAll('#logkelolabuku')[0].style.display='none';
     sembunyi(document.querySelectorAll('#pencarianmodesimplified')[0]);
 	}
 
@@ -231,6 +257,285 @@ $tanggal=date('d/m/Y');
 
 	var awal=parseInt(document.querySelectorAll('#indexpagination')[0].innerText);
 
+  $(document).on('input', '#kueripencarianpinjaman', (e)=>{
+    $.ajax({
+      url:'api.php',
+      type:'POST',
+      data:'kueripencaripinjaman=true&query='+e.currentTarget.value,
+      success: function(res){
+        document.getElementById('isibodypinjaman').innerHTML=res;
+         document.querySelectorAll('.modekelolapinjaman')[0].value='Kelola Pinjaman';
+        var rowpinjaman=document.querySelectorAll('#rowpinjaman');
+        var tglsekarang=document.getElementById('date').innerHTML;
+        var x=/(\d+)\/(\d+)\/(\d+)/.exec(tglsekarang);
+        var t=parseInt(x[3])*360;
+        var b=parseInt(x[2])*30;  
+        var h=parseInt(x[1]);
+        var date=t+b+h;
+
+        rowpinjaman.forEach((a,b)=>{
+        var hasil=/<td>\d+-\d+-\d+<\/td>\s+<td>(\d+-\d+-\d+)<\/td>/.exec(a.innerHTML)[1];
+        var a=/(\d+)-(\d+)-(\d+)/.exec(hasil);
+        var tahun=parseInt(a[1])*360;
+        var bulan=parseInt(a[2])*30;
+        var hari=parseInt(a[3]);
+        var dd=tahun+bulan+hari;
+        var hash=date-dd;
+        console.log(hash);
+
+         if(hash>0){
+        document.querySelectorAll('#rowpinjaman')[b].classList.add('table-danger');
+        }
+
+        else if(hash<0){
+        document.querySelectorAll('#rowpinjaman')[b].classList.add('table-success');
+      
+        }
+
+        else if(hash=0){
+        document.querySelectorAll('#rowpinjaman')[b].classList.add('table-warning');
+        }
+  
+      
+        })
+
+
+      },
+      error: function(err){
+        console.log(err);
+      }
+    })
+  })
+
+  $(document).on('input', '.modekelolapinjaman', function(e){
+    if(e.currentTarget.value.match('Kelola')){
+      alert('kelola pinjaman');
+    }
+    if(e.currentTarget.value.match('Log')){
+      cilukba();
+      document.querySelectorAll('#logkelolabuku')[0].style.display='';
+    }
+  })
+
+  $(document).on('click','#kelolastatistik', (e)=>{
+    cilukba();
+    document.querySelectorAll('#panelkelolastatistik')[0].style.display='';
+  })
+
+  $(document).on('click', '.hapuskelolapinjaman', (e)=>{
+    let nomortogel=/nomortogel=\"(\d+)\"/.exec(e.currentTarget.outerHTML)[1];
+    $.ajax({
+      type:'POST',
+      data:'hapuskelolapinjamanmas=true&nomortogel='+nomortogel,
+      url:'api.php',
+      success: function(res){
+         $.ajax({
+      type:'POST',
+      data:'loadkelolapinjaman=true',
+      url:'api.php',
+      success: function(res){
+        document.getElementById('kueripencarianpinjaman').value="";
+        document.getElementById('isibodypinjaman').innerHTML=res;
+        document.querySelectorAll('.modekelolapinjaman')[0].value='Kelola Pinjaman';
+        var rowpinjaman=document.querySelectorAll('#rowpinjaman');
+        var tglsekarang=document.getElementById('date').innerHTML;
+        var x=/(\d+)\/(\d+)\/(\d+)/.exec(tglsekarang);
+        var t=parseInt(x[3])*360;
+        var b=parseInt(x[2])*30;  
+        var h=parseInt(x[1]);
+        var date=t+b+h;
+
+        rowpinjaman.forEach((a,b)=>{
+        var hasil=/<td>\d+-\d+-\d+<\/td>\s+<td>(\d+-\d+-\d+)<\/td>/.exec(a.innerHTML)[1];
+        var a=/(\d+)-(\d+)-(\d+)/.exec(hasil);
+        var tahun=parseInt(a[1])*360;
+        var bulan=parseInt(a[2])*30;
+        var hari=parseInt(a[3]);
+        var dd=tahun+bulan+hari;
+        var hash=date-dd;
+        console.log(hash);
+
+         if(hash>0){
+        document.querySelectorAll('#rowpinjaman')[b].classList.add('table-danger');
+        }
+
+        else if(hash<0){
+        document.querySelectorAll('#rowpinjaman')[b].classList.add('table-success');
+      
+        }
+
+        else if(hash=0){
+        document.querySelectorAll('#rowpinjaman')[b].classList.add('table-warning');
+        }
+  
+      
+        })
+
+
+      },
+      error: function(err){
+        console.log(err);
+      }
+    })
+      },
+      error: function(err){
+        console.log(err);
+      }
+    })
+  })
+
+  $(document).on('click', '.kembalikanpinjamanbuku', (e)=>{
+
+    let tglsekarang=document.getElementById('date').innerHTML;
+    let x=/(\d+)\/(\d+)\/(\d+)/.exec(tglsekarang);
+    let t=parseInt(x[3])*360;
+    let b=parseInt(x[2])*30;  
+    let h=parseInt(x[1]);
+    let date=t+b+h;
+    var denda=0;
+    let index=/kodeindex=\"(\d+)\"/.exec(e.currentTarget.outerHTML)[1];
+    let i=document.querySelectorAll('#rowpinjaman')[index];
+    let hasil=/<td>\d+-\d+-\d+<\/td>\s+<td>(\d+-\d+-\d+)<\/td>/.exec(i.outerHTML)[1];
+    let a=/(\d+)-(\d+)-(\d+)/.exec(hasil);
+    let tahun=parseInt(a[1])*360;
+    let bulan=parseInt(a[2])*30;
+    let hari=parseInt(a[3]);
+    let dd=tahun+bulan+hari;
+    let hash=date-dd;
+    if(hash<0){
+      denda=0;
+    }
+    if(hash>0){
+      denda=hash*12000;
+    }
+    if(hash=0){
+      denda=0;
+    }
+    //alert(denda);
+    let query=(e.currentTarget.id);
+    let z=/<td>([^<]+)<\/td>\s+<td>([^<]+)<\/td>\s+<td>([^<]+)<\/td>\s+<td>([^<]+)<\/td>\s+/.exec(i.outerHTML);
+    console.log(i.outerHTML);
+    let judul=z[1];
+    let peminjam=z[2];
+    let waktupinjam=z[3];
+    let batas=z[4];
+    let pattern=/(\d+)\/(\d+)\/(\d+)/.exec(tglsekarang);
+    let s=pattern[3]+'-'+pattern[2]+'-'+pattern[1];
+    console.log(s);
+    $.ajax({
+      type:'POST',
+      url:'api.php',
+      data:'kembalikanpinjamanbuku=true&query='+query+'&denda='+denda+'&peminjam='+peminjam+'&waktupinjam='+waktupinjam+'&waktupengembalian='+s,
+      success: function(res){
+        $.ajax({
+      type:'POST',
+      data:'loadkelolapinjaman=true',
+      url:'api.php',
+      success: function(res){
+        document.getElementById('kueripencarianpinjaman').value="";
+        document.getElementById('isibodypinjaman').innerHTML=res;
+        document.querySelectorAll('.modekelolapinjaman')[0].value='Kelola Pinjaman';
+        var rowpinjaman=document.querySelectorAll('#rowpinjaman');
+        var tglsekarang=document.getElementById('date').innerHTML;
+        var x=/(\d+)\/(\d+)\/(\d+)/.exec(tglsekarang);
+        var t=parseInt(x[3])*360;
+        var b=parseInt(x[2])*30;  
+        var h=parseInt(x[1]);
+        var date=t+b+h;
+
+        rowpinjaman.forEach((a,b)=>{
+        var hasil=/<td>\d+-\d+-\d+<\/td>\s+<td>(\d+-\d+-\d+)<\/td>/.exec(a.innerHTML)[1];
+        var a=/(\d+)-(\d+)-(\d+)/.exec(hasil);
+        var tahun=parseInt(a[1])*360;
+        var bulan=parseInt(a[2])*30;
+        var hari=parseInt(a[3]);
+        var dd=tahun+bulan+hari;
+        var hash=date-dd;
+        console.log(hash);
+
+         if(hash>0){
+        document.querySelectorAll('#rowpinjaman')[b].classList.add('table-danger');
+        }
+
+        else if(hash<0){
+        document.querySelectorAll('#rowpinjaman')[b].classList.add('table-success');
+      
+        }
+
+        else if(hash=0){
+        document.querySelectorAll('#rowpinjaman')[b].classList.add('table-warning');
+        }
+  
+      
+        })
+
+
+      },
+      error: function(err){
+        console.log(err);
+      }
+    })
+      },
+      error: function(err){
+        console.log(err);
+      }
+    })
+  })
+
+  $(document).on('dblclick', '#rowpinjaman', function(e){
+    if(e.currentTarget.classList.value.match('danger')){
+      let tglsekarang=document.getElementById('date').innerHTML;
+      let x=/(\d+)\/(\d+)\/(\d+)/.exec(tglsekarang);
+      let t=parseInt(x[3])*360;
+      let b=parseInt(x[2])*30;  
+      let h=parseInt(x[1]);
+      let date=t+b+h;
+
+      let hasil=/<td>\d+-\d+-\d+<\/td>\s+<td>(\d+-\d+-\d+)<\/td>/.exec(e.currentTarget.outerHTML)[1];
+      let a=/(\d+)-(\d+)-(\d+)/.exec(hasil);
+      let tahun=parseInt(a[1])*360;
+      let bulan=parseInt(a[2])*30;
+      let hari=parseInt(a[3]);
+      let dd=tahun+bulan+hari;
+      let hash=date-dd;
+      alert('Sudah lewat selama : '+hash+' hari');
+    }
+    if(e.currentTarget.classList.value.match('warning')){
+      let tglsekarang=document.getElementById('date').innerHTML;
+      let x=/(\d+)\/(\d+)\/(\d+)/.exec(tglsekarang);
+      let t=parseInt(x[3])*360;
+      let b=parseInt(x[2])*30;  
+      let h=parseInt(x[1]);
+      let date=t+b+h;
+
+      let hasil=/<td>\d+-\d+-\d+<\/td>\s+<td>(\d+-\d+-\d+)<\/td>/.exec(e.currentTarget.outerHTML)[1];
+      let a=/(\d+)-(\d+)-(\d+)/.exec(hasil);
+      let tahun=parseInt(a[1])*360;
+      let bulan=parseInt(a[2])*30;
+      let hari=parseInt(a[3]);
+      let dd=tahun+bulan+hari;
+      let hash=date-dd;
+      alert('Sudah lewat selama : '+hash+' hari');
+    }
+    if(e.currentTarget.classList.value.match('success')){
+      let tglsekarang=document.getElementById('date').innerHTML;
+      let x=/(\d+)\/(\d+)\/(\d+)/.exec(tglsekarang);
+      let t=parseInt(x[3])*360;
+      let b=parseInt(x[2])*30;  
+      let h=parseInt(x[1]);
+      let date=t+b+h;
+
+      let hasil=/<td>\d+-\d+-\d+<\/td>\s+<td>(\d+-\d+-\d+)<\/td>/.exec(e.currentTarget.outerHTML)[1];
+      let a=/(\d+)-(\d+)-(\d+)/.exec(hasil);
+      let tahun=parseInt(a[1])*360;
+      let bulan=parseInt(a[2])*30;
+      let hari=parseInt(a[3]);
+      let dd=tahun+bulan+hari;
+      let hash=date-dd;
+      alert('Sudah lewat selama : '+hash+' hari');
+    }
+  })
+
   $(document).on('click', '#kelolapinjaman', function(e){
     e.preventDefault();
     $.ajax({
@@ -239,7 +544,8 @@ $tanggal=date('d/m/Y');
       url:'api.php',
       success: function(res){
         document.getElementById('isibodypinjaman').innerHTML=res;
-
+        document.getElementById('kueripencarianpinjaman').value="";
+        document.querySelectorAll('.modekelolapinjaman')[0].value='Kelola Pinjaman';
         var rowpinjaman=document.querySelectorAll('#rowpinjaman');
         var tglsekarang=document.getElementById('date').innerHTML;
         var x=/(\d+)\/(\d+)\/(\d+)/.exec(tglsekarang);
@@ -313,11 +619,13 @@ $tanggal=date('d/m/Y');
   $(document).on('click', '#btntambahpinjaman', (e)=>{
     if(e.currentTarget.outerHTML.match('Tambah Pinjaman')){
     document.getElementById('formkelolapinjaman').style.display='';
-    e.currentTarget.outerHTML='<button id="btntambahpinjaman" type="button" class="btn btn-success" style="margin-bottom: 10px;">Tutup</button>';
+    sembunyi(document.getElementById('kueripencarianpinjaman'));
+    e.currentTarget.outerHTML='<button id="btntambahpinjaman" type="button" class="btn btn-success" style="margin-bottom: 10px;float: left;">Tutup</button>';
     }
     else if(e.currentTarget.outerHTML.match('Tutup')){
     document.getElementById('formkelolapinjaman').style.display='none';
-    e.currentTarget.outerHTML='<button id="btntambahpinjaman" type="button" class="btn btn-success" style="margin-bottom: 10px;">Tambah Pinjaman</button>';
+    tidaksembunyi(document.getElementById('kueripencarianpinjaman'));
+    e.currentTarget.outerHTML='<button id="btntambahpinjaman" type="button" class="btn btn-success" style="margin-bottom: 10px;float: left;">Tambah Pinjaman</button>';
     }
     
 

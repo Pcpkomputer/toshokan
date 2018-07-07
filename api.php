@@ -12,7 +12,7 @@ if(isset($_POST['ifetch'])){
 		  <h5 class="card-header">'.$konten['judul'].'</h5>
 		  <div class="card-body">
 		    <h5 class="card-title">'.$konten['penulis'].' / '.$konten['penerbit'].' / '.$konten['tahunterbit'].'</h5>
-		    <p class="card-text">'.$konten['penjelasan'].'</p>
+		    <p class="card-text" style="max-height:146;overflow:hidden;">'.$konten['penjelasan'].'</p>
 		    <a href="#" id="selengkapnya_1" jurukunci="'.$konten['id'].'" class="btn btn-dark">Selengkapnya</a>
 		  </div>
 		</div>
@@ -533,19 +533,79 @@ if(isset($_POST['tambahpinjamanbuku'])){
 
 if(isset($_POST['loadkelolapinjaman'])){
 	include 'db.php';
+	$index=-1;
 	$query='SELECT * FROM pinjaman_buku ORDER BY id DESC;';
 	$konek=$conn->query($query);
 	while($hasil=$konek->fetch_assoc()){
+		$index=$index+1;
 		echo ' <tr id="rowpinjaman">
       <td>'.$hasil['judul'].'</td>
       <td>'.$hasil['peminjam'].'</td>
       <td>'.$hasil['waktupinjam'].'</td>
       <td>'.$hasil['bataspengembalian'].'</td>
-      <td><button class="btn btn-success">Dikembalikan</button><button class="btn btn-danger">Hapus</button></td>
+      <td><button kodeindex="'.$index.'" id="'.$hasil['judul'].'" class="btn btn-success kembalikanpinjamanbuku">Dikembalikan</button><button nomortogel="'.$hasil['id'].'" class="btn btn-danger hapuskelolapinjaman">Hapus</button></td>
     </tr>
     ';
 	}
 
+}
+
+if(isset($_POST['kembalikanpinjamanbuku'])){
+	include 'db.php';
+	$q='INSERT INTO log_pinjaman (id,judul,peminjam,waktupinjam,waktupengembalian,denda) VALUES (NULL,"'.$_POST['query'].'","'.$_POST['peminjam'].'","'.$_POST['waktupinjam'].'","'.$_POST['waktupengembalian'].'","'.$_POST['denda'].'");';
+  var_dump($_POST['waktupengembalian']);
+  if($conn->query($q)==True){
+    include 'db.php';
+    $t='SELECT * FROM daftar_buku WHERE judul="'.$_POST['query'].'";';
+    $kon=$conn->query($t);
+    $hasil=$kon->fetch_assoc();
+    $stoksekarang=(int)$hasil['stok']+1;
+    $a='UPDATE daftar_buku SET stok="'.$stoksekarang.'" WHERE judul="'.$_POST['query'].'";';
+    if($conn->query($a)==True){
+      $l='DELETE FROM pinjaman_buku WHERE judul="'.$_POST['query'].'";';
+      if($conn->query($l)==True){
+        print_r('sukses');
+      }
+      else{
+        print_r('gagal');
+      }
+    }
+    else{
+      print_r('gagal');
+    }
+  }
+  else{
+    print_r('gagal');
+  }
+}
+
+if(isset($_POST['hapuskelolapinjamanmas'])){
+  include 'db.php';
+  $q='DELETE FROM pinjaman_buku WHERE id="'.$_POST['nomortogel'].'";';
+  if($conn->query($q)==True){
+    print_r('sukses');
+  }
+  else{
+    print_r('gagal');
+  }
+}
+
+if(isset($_POST['kueripencaripinjaman'])){
+  include 'db.php';
+  $var='SELECT * FROM pinjaman_buku WHERE judul LIKE "%'.$_POST['query'].'%" OR peminjam LIKE "%'.$_POST['query'].'%";';
+  $koneksi=$conn->query($var);
+  $index=-1;
+  while($hasil=$koneksi->fetch_assoc()){
+    $index=$index+1;
+    echo ' <tr id="rowpinjaman">
+      <td>'.$hasil['judul'].'</td>
+      <td>'.$hasil['peminjam'].'</td>
+      <td>'.$hasil['waktupinjam'].'</td>
+      <td>'.$hasil['bataspengembalian'].'</td>
+      <td><button kodeindex="'.$index.'" id="'.$hasil['judul'].'" class="btn btn-success kembalikanpinjamanbuku">Dikembalikan</button><button nomortogel="'.$hasil['id'].'" class="btn btn-danger hapuskelolapinjaman">Hapus</button></td>
+    </tr>
+    ';
+  }
 }
 
 ?>
