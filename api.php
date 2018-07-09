@@ -1,4 +1,82 @@
 <?php
+session_start();
+
+
+  if(isset($_POST['ngeceksesi'])){
+    print_r($_SESSION['mode']);
+    if(isset($_SESSION['mode'])){
+      print_r('adasesi');
+    }
+    if(!isset($_SESSION['mode'])){
+      print_r('tidakadasesi');
+    }
+    
+  }
+
+  if(isset($_POST['loginform'])){
+    include 'db.php';
+    $q='SELECT * FROM pengurus_toshokan WHERE email="'.$_POST['email'].'";';
+    $koneksi=$conn->query($q);
+    if(mysqli_num_rows($koneksi)==0){
+      print_r('tidakditemukan');
+    }
+    else{
+      $hasil=$koneksi->fetch_assoc();
+      if($hasil['password']==$_POST['password']){
+        session_start();
+        $_SESSION['username']=$hasil['username'];
+        $_SESSION['nama']=$hasil['nama'];
+        $_SESSION['mode']='admin';
+        echo 'sukses';
+      }
+      else{
+        echo 'passwordsalah';
+      }
+    }
+  }
+
+
+  if(isset($_POST['querypencarianindex'])){
+  include 'db.php';
+  $q='SELECT * FROM daftar_buku WHERE judul LIKE "%'.$_POST['query'].'%";';
+  $kon=$conn->query($q);
+  while($hasil=$kon->fetch_assoc()){
+    if($hasil['stok']>0){
+      $a='green';
+      $k='Stok masih tersedia';
+    }
+    if($hasil['stok']==0){
+      $a='red';
+      $k='Stok habis / Sedang dipinjam';
+    }
+    echo ' <tr>
+          <td>
+         <img src="assets/image/'.$hasil['gambar'].'" style="width: 120px; height: 150px">
+          <td>
+            <td>
+        <p style="color:#1c2e36;margin-left: 0px; font-size: 20px;margin-top: -19px"><b>'.$hasil['judul'].'</b></p>
+        <p style="color:#1c2e36;margin-left: 0px; font-size: 13px;margin-top: -18px">'.$hasil['penulis'].' / '.$hasil['penerbit'].' / '.$hasil['tahunterbit'].' / '.$hasil['lokasi'].'</p>
+         <p style="color:#1c2e36;margin-left: 0px; font-size: 12px;word-wrap: break-word;max-height: 48px; overflow: hidden;">'.$hasil['penjelasan'].'</p>
+         <label style="font-size: 12px">Kategori : '.$hasil['kategori'].'</label><label style="float: right;font-size: 12px;margin-top: 8px;color: '.$a.'">'.$k.'</label>
+            </td>
+        </tr>
+
+        <tr>
+          <td colspan="3"><hr></td>
+        </tr>';
+  }
+
+}
+
+if(!isset($_SESSION['mode'])){
+
+}
+else{
+
+if(isset($_POST['logoutadmin'])){
+  session_unset();
+}
+
 if(isset($_POST['ifetch'])){
 	$fetchid=$_POST['ifetch'];
 	$fetchid=((int)$fetchid-1)*2;
@@ -387,6 +465,7 @@ if(isset($_POST['loadmodekelolabuku2'])){
 	$query='SELECT * FROM daftar_buku;';
 	$koneksi=$conn->query($query);
 	echo ' <hr id="kududihiddenmode2">
+  <button id="btnkuduhidden2" class="btn btn-success" style="float: right;margin-right: 105px;margin-top: 3.5px">+</button>
         <h1 id="kududihiddenmode2">Kelola Buku - Simplified</h1>
         <hr>
         <select id="kududihiddenmode2" class="form-control modekelolabukumode2" style="width: 100px;float: right;margin-top:-67px;">
@@ -534,11 +613,14 @@ if(isset($_POST['tambahpinjamanbuku'])){
 if(isset($_POST['loadkelolapinjaman'])){
 	include 'db.php';
 	$index=-1;
+  $no=0;
 	$query='SELECT * FROM pinjaman_buku ORDER BY id DESC;';
 	$konek=$conn->query($query);
 	while($hasil=$konek->fetch_assoc()){
 		$index=$index+1;
-		echo ' <tr id="rowpinjaman">
+		$no=$no+1;
+    echo ' <tr id="rowpinjaman">
+    <td>'.$no.'</td>
       <td>'.$hasil['judul'].'</td>
       <td>'.$hasil['peminjam'].'</td>
       <td>'.$hasil['waktupinjam'].'</td>
@@ -552,7 +634,7 @@ if(isset($_POST['loadkelolapinjaman'])){
 
 if(isset($_POST['kembalikanpinjamanbuku'])){
 	include 'db.php';
-	$q='INSERT INTO log_pinjaman (id,judul,peminjam,waktupinjam,waktupengembalian,denda) VALUES (NULL,"'.$_POST['query'].'","'.$_POST['peminjam'].'","'.$_POST['waktupinjam'].'","'.$_POST['waktupengembalian'].'","'.$_POST['denda'].'");';
+	$q='INSERT INTO log_pinjaman (id,judul,peminjam,waktupinjam,waktupengembalian,bataswaktu,denda) VALUES (NULL,"'.$_POST['query'].'","'.$_POST['peminjam'].'","'.$_POST['waktupinjam'].'","'.$_POST['waktupengembalian'].'","'.$_POST['batas'].'","'.$_POST['denda'].'");';
   var_dump($_POST['waktupengembalian']);
   if($conn->query($q)==True){
     include 'db.php';
@@ -592,12 +674,15 @@ if(isset($_POST['hapuskelolapinjamanmas'])){
 
 if(isset($_POST['kueripencaripinjaman'])){
   include 'db.php';
-  $var='SELECT * FROM pinjaman_buku WHERE judul LIKE "%'.$_POST['query'].'%" OR peminjam LIKE "%'.$_POST['query'].'%";';
+  $var='SELECT * FROM pinjaman_buku WHERE judul LIKE "%'.$_POST['query'].'%" OR waktupinjam LIKE "%'.$_POST['query'].'%" OR peminjam LIKE "%'.$_POST['query'].'%";';
   $koneksi=$conn->query($var);
   $index=-1;
+  $no=0;
   while($hasil=$koneksi->fetch_assoc()){
     $index=$index+1;
+    $no=$no+1;
     echo ' <tr id="rowpinjaman">
+      <td>'.$no.'</td>
       <td>'.$hasil['judul'].'</td>
       <td>'.$hasil['peminjam'].'</td>
       <td>'.$hasil['waktupinjam'].'</td>
@@ -606,6 +691,89 @@ if(isset($_POST['kueripencaripinjaman'])){
     </tr>
     ';
   }
+}
+
+if(isset($_POST['loadlogpinjaman'])){
+  include 'db.php';
+  $limit=7;
+  $no=0;
+  $offset=((int)$_POST['i']-1)*7;
+  $q='SELECT * FROM log_pinjaman ORDER BY id ASC LIMIT 7 OFFSET '.$offset.';';
+  $koneksi=$conn->query($q);
+  echo '<table class="table table-sm">
+  <thead>
+    <tr>
+      <th scope="col">No</th>
+      <th scope="col">Judul</th>
+      <th scope="col">Peminjam</th>
+      <th scope="col">Waktu Pinjam</th>
+      <th scope="col">Waktu Pengembalian</th>
+      <th scope="col">Batas Waktu</th>
+      <th scope="col">Denda</th>
+    </tr>
+  </thead>
+  <tbody>';
+  while($hasil=$koneksi->fetch_assoc()){
+    echo ' <tr>
+      <th scope="row">'.$hasil['id'].'</th>
+      <td>'.$hasil['judul'].'</td>
+      <td>'.$hasil['peminjam'].'</td>
+      <td>'.$hasil['waktupinjam'].'</td>
+      <td>'.$hasil['waktupengembalian'].'</td>
+      <td>'.$hasil['bataswaktu'].'</td>
+      <td>'.$hasil['denda'].'</td>
+    </tr>';
+  }
+    echo '
+  </tbody>
+</table>';
+}
+
+if(isset($_POST['loadpeaklimitpaglog'])){
+  include 'db.php';
+  $limit=7;
+  $q='SELECT * FROM log_pinjaman';
+  $koneksi=$conn->query($q);
+  $i=floor((int)mysqli_num_rows($koneksi)/(int)$limit)+1;
+  print_r($i);
+}
+
+if(isset($_POST['loadlogpinjamanstr'])){
+  include 'db.php';
+  $q='SELECT * FROM log_pinjaman;';
+  $c=$conn->query($q);
+  echo ' <textarea class="form-control" id=regexplog style="height: 250px;">';
+  while($res=$c->fetch_assoc()){
+   echo '['.$res['judul'].']['.$res['peminjam'].']['.$res['waktupinjam'].']['.$res['waktupengembalian'].']['.$res['bataswaktu'].']['.$res['denda'].']&#13;';
+  }
+  echo '</textarea>';
+}
+
+if(isset($_FILES['gambar_2'])){
+  if(strlen($_FILES['gambar_2']['name'])==0){
+    $img='null.jpg';
+  }
+  if(strlen($_FILES['gambar_2']['name'])>0){
+    $img=$_FILES['gambar_2']['name'];
+  }
+  //move_uploaded_file($_FILES['gambar_2']['tmp_name'], 'assets/image/'.$img)
+  print_r($img);
+   
+
+}
+
+if(isset($_POST['tambahbuku'])){
+  include 'db.php';
+  $r='INSERT INTO daftar_buku (id,judul,penjelasan,gambar,lokasi,penulis,penerbit,tahunterbit,stok,kategori) VALUES (NULL,"'.$_POST['judul'].'","'.$_POST['deskripsi'].'","'.$_POST['file'].'","'.$_POST['lokasi'].'","'.$_POST['penulis'].'","'.$_POST['penerbit'].'","'.$_POST['tahunterbit'].'","'.$_POST['stok'].'","'.$_POST['kategori'].'");';
+  if($conn->query($r)==True){
+    print_r('sukses');
+  }
+  else{
+    print_r('gagal');
+  }
+}
+
+
 }
 
 ?>
