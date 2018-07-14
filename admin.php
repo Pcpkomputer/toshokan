@@ -157,6 +157,7 @@ if(!isset($_SESSION['mode'])=='admin'){
 
 <div id="dropdownn" class="dropdown-menu dropdown-menu-right show" x-placement="bottom-end" style="display: none;position: absolute; transform: translate3d(-35px, 45px, 0px); top: 0px; right: 0px; will-change: transform">
 	  <h6 class="dropdown-header">Menu Atas</h6>
+    <button id="btnutama" onclick=location.href='index.php'; class="dropdown-item" type="button">Home</button>
     <button id="btnstatistik" class="dropdown-item" type="button">Statistik</button>
       <div class="dropdown-divider"></div>
     <button id="btnlogout" class="dropdown-item" type="button">Logout</button>
@@ -442,7 +443,6 @@ if(!isset($_SESSION['mode'])=='admin'){
       type:'POST',
       data:'logoutadmin=true',
       success: function(res){
-        alert('123');
         location.href='index.php';
       },
       error: function(err){
@@ -923,6 +923,7 @@ $(document).on('click', '#btnkuduhidden2', function(e){
     let batas=z[4];
     let pattern=/(\d+)\/(\d+)\/(\d+)/.exec(tglsekarang);
     let s=pattern[3]+'-'+pattern[2]+'-'+pattern[1];
+    alert(waktupinjam);
     console.log(s);
     $.ajax({
       type:'POST',
@@ -1098,7 +1099,9 @@ $(document).on('click', '#btnkuduhidden2', function(e){
     var tanggalskr=document.getElementById('date').innerHTML.replace(/\//g,'-');
     var tanggalskr=/(\d+)-(\d+)-(\d+)/.exec(tanggalskr);
     var tgl=tanggalskr[3]+'-'+tanggalskr[2]+'-'+tanggalskr[1];
+    alert(tgl);
     var data=data+'&tambahpinjamanbuku=true&tanggalkirim='+tgl;
+    alert(data);
     $.ajax({
       url:'api.php',
       type:'POST',
@@ -1111,7 +1114,61 @@ $(document).on('click', '#btnkuduhidden2', function(e){
           console.log('gagal');
         }
         if(res.match('sukses')){
-          console.log(res);
+             
+
+ $.ajax({
+      type:'POST',
+      data:'loadkelolapinjaman=true',
+      url:'api.php',
+      success: function(res){
+        document.getElementById('isibodypinjaman').innerHTML=res;
+        document.getElementById('kueripencarianpinjaman').value="";
+        document.querySelectorAll('.modekelolapinjaman')[0].value='Kelola Pinjaman';
+        var rowpinjaman=document.querySelectorAll('#rowpinjaman');
+        var tglsekarang=document.getElementById('date').innerHTML;
+        var x=/(\d+)\/(\d+)\/(\d+)/.exec(tglsekarang);
+        var t=parseInt(x[3])*360;
+        var b=parseInt(x[2])*30;  
+        var h=parseInt(x[1]);
+        var date=t+b+h;
+
+        rowpinjaman.forEach((a,b)=>{
+        var hasil=/<td>\d+-\d+-\d+<\/td>\s+<td>(\d+-\d+-\d+)<\/td>/.exec(a.innerHTML)[1];
+        var a=/(\d+)-(\d+)-(\d+)/.exec(hasil);
+        var tahun=parseInt(a[1])*360;
+        var bulan=parseInt(a[2])*30;
+        var hari=parseInt(a[3]);
+        var dd=tahun+bulan+hari;
+        var hash=date-dd;
+        console.log(hash);
+        var hashstr=hash.toString();
+
+         if(hash>0){
+        document.querySelectorAll('#rowpinjaman')[b].classList.add('table-danger');
+        }
+
+        if(hash<0){
+        document.querySelectorAll('#rowpinjaman')[b].classList.add('table-success');
+      
+        }
+
+        if(hashstr=='0'){
+        document.querySelectorAll('#rowpinjaman')[b].classList.add('table-warning');
+        }
+  
+      
+        })
+
+
+      },
+      error: function(err){
+        console.log(err);
+      }
+    })
+
+
+
+
         }
       },
       error: function(err){
@@ -1141,7 +1198,7 @@ $(document).on('click', '#btnkuduhidden2', function(e){
     console.log(formData);
     let kodetogel=/kodetogel=\"(\d+)\"/.exec(document.getElementById('kontenkelolabuku').innerHTML)[1];
     $.ajax({
-      url: 'imagehandler.php',
+      url: 'api.php',
       type: 'POST',
       data: formData,
       async: false,
@@ -1151,7 +1208,7 @@ $(document).on('click', '#btnkuduhidden2', function(e){
       processData: false,
       success: function(response){
         $.ajax({
-          url:'imagehandler.php',
+          url:'api.php',
           type:'POST',
           data:'updatestringgambar=true&kodetogel='+kodetogel+'&namafile='+response,
           success: function(response){
